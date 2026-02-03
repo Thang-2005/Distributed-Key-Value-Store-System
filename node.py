@@ -12,11 +12,20 @@ import logging
 from datetime import datetime
 
 # Cấu hình logging
+import sys
+import io
+
+# Fix Unicode encoding issue on Windows
+if sys.platform == 'win32':
+    # Set encoding to UTF-8 for stdout/stderr
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('node.log'),
+        logging.FileHandler('node.log', encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
