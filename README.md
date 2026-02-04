@@ -549,7 +549,12 @@ distributed-kv-store/
 │   │   ├── test_6_recovery()            # Test recovery
 │   │   ├── test_7_load_distribution()   # Test load balancing
 │   │   └── test_8_sync()                # Test sync
-│
+├── cli_node_client.py           # CLI client chọn node cụ thể
+│   └── Cho phép gửi request trực tiếp đến từng node trong clustertest_1_basic_operations()   
+│   │   ├──Test PUT/GET/DELETE
+│   │   ├── STATUS   cluster      
+│    
+│     
 └── node.log                     # Log file (auto-generated)
 ```
 

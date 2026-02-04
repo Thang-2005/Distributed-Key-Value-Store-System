@@ -98,7 +98,7 @@ def main():
     # Test 3: Cluster Status
     print_section("TEST 3: TRẠNG THÁI CLUSTER")
     
-    client.print_cluster_status()
+    client.hien_thi_trang_thai_cluster()
     
     input("\n✓ Test 3 hoàn thành. Nhấn Enter để tiếp tục...")
     
@@ -107,7 +107,7 @@ def main():
     
     print("\n1. Lưu 20 keys:")
     for i in range(1, 21):
-        client.put(f"key_{i}", f"value_{i}", verbose=False)
+        client.put(f"key_{i}", f"value_{i}", hien_thi=False)
         print(f"  ✓ Đã lưu key_{i}")
     
     time.sleep(2)
@@ -115,9 +115,9 @@ def main():
     print("\n2. Phân bổ dữ liệu trên các nodes:")
     for i, node in enumerate(nodes):
         test_client = KVStoreClient([node])
-        stats = test_client.get_node_stats(0)
+        stats = test_client.lay_thong_ke_node(0)
         if stats:
-            print(f"  Node {i+1}: {stats.get('data_count', 0)} keys")
+            print(f"  Node {i+1}: {stats.get('so_key', 0)} keys")
     
     input("\n✓ Test 4 hoàn thành. Nhấn Enter để tiếp tục...")
     
@@ -128,25 +128,25 @@ def main():
     for i, node in enumerate(nodes):
         print(f"\nNode {i+1} ({node[0]}:{node[1]}):")
         test_client = KVStoreClient([node])
-        stats = test_client.get_node_stats(0)
+        stats = test_client.lay_thong_ke_node(0)
         if stats:
-            print(f"  Uptime: {stats.get('uptime', 0):.1f}s")
-            print(f"  Data: {stats.get('data_count', 0)} keys")
-            print(f"  Peers: {stats.get('peer_count', 0)}")
-            print(f"  PUTs: {stats.get('puts', 0)}")
-            print(f"  GETs: {stats.get('gets', 0)}")
-            print(f"  Replications: {stats.get('replications', 0)}")
+            print(f"  Uptime: {stats.get('thoi_gian_hoat_dong', 0):.1f}s")
+            print(f"  Data: {stats.get('so_key', 0)} keys")
+            print(f"  Peers: {stats.get('so_peer', 0)}")
+            print(f"  PUTs: {stats.get('so_lan_put', 0)}")
+            print(f"  GETs: {stats.get('so_lan_get', 0)}")
+            print(f"  Replications: {stats.get('so_lan_nhan_ban', 0)}")
         else:
             print("  ✗ Node offline")
     
     print("\n2. Thống kê client:")
-    client_stats = client.get_client_stats()
-    print(f"  Total requests: {client_stats['requests']}")
-    print(f"  Successes: {client_stats['successes']}")
-    print(f"  Failures: {client_stats['failures']}")
-    print(f"  Retries: {client_stats['retries']}")
-    if client_stats['requests'] > 0:
-        success_rate = (client_stats['successes'] / client_stats['requests']) * 100
+    client_stats = client.lay_thong_ke_client()
+    print(f"  Total requests: {client_stats['so_request']}")
+    print(f"  Successes: {client_stats['thanh_cong']}")
+    print(f"  Failures: {client_stats['that_bai']}")
+    print(f"  Retries: {client_stats['so_lan_thu_lai']}")
+    if client_stats['so_request'] > 0:
+        success_rate = (client_stats['thanh_cong'] / client_stats['so_request']) * 100
         print(f"  Success rate: {success_rate:.1f}%")
     
     input("\n✓ Test 5 hoàn thành. Nhấn Enter để tiếp tục...")
@@ -182,7 +182,7 @@ Bài test này yêu cầu bạn thao tác thủ công:
     client.get("after_failure")
     
     print("\n4. Trạng thái cluster:")
-    client.print_cluster_status()
+    client.hien_thi_trang_thai_cluster()
     
     print("""
 5. KHÔI PHỤC NODE:
@@ -196,7 +196,7 @@ Bài test này yêu cầu bạn thao tác thủ công:
     time.sleep(3)
     
     print("\n6. Trạng thái cluster sau recovery:")
-    client.print_cluster_status()
+    client.hien_thi_trang_thai_cluster()
     
     input("\n✓ Test 6 hoàn thành. Nhấn Enter để kết thúc...")
     
@@ -225,7 +225,7 @@ CÁC TÍNH NĂNG ĐÃ DEMO:
 • Client-side retry logic
 
 ĐỂ TEST THÊM:
-- Chạy: python test_system.py (test suite đầy đủ)
+- Chạy: python test_manual.py (test suite đầy đủ)
 - Chạy: python cli_client.py (client tương tác)
 - Xem: README.md (tài liệu đầy đủ)
 

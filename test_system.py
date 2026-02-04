@@ -21,7 +21,6 @@ class TestRunner:
         self.test_passed = 0
         self.test_failed = 0
         self.test_total = 0
-    
     def assert_equal(self, actual, expected, test_name):
         """Kiểm tra giá trị có khớp không"""
         self.test_total += 1
@@ -34,7 +33,7 @@ class TestRunner:
             print(f"  ✗ {test_name}")
             print(f"    Mong đợi: {expected}, Nhận được: {actual}")
             return False
-    
+
     def assert_true(self, condition, test_name):
         """Kiểm tra điều kiện đúng"""
         self.test_total += 1
@@ -46,6 +45,20 @@ class TestRunner:
             self.test_failed += 1
             print(f"  ✗ {test_name}")
             return False
+
+    def retry_operation(self, operation, max_retries=3, delay=1):
+        """Thử lại một operation nếu thất bại"""
+        for attempt in range(max_retries):
+            try:
+                result = operation()
+                return result
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    print(f"    ⚠ Retry ({attempt+1}/{max_retries})...: {e}")
+                    time.sleep(delay)
+                else:
+                    print(f"    ✗ Thất bại sau {max_retries} lần thử: {e}")
+                    return None
     
     def print_header(self, title):
         """In tiêu đề test"""
@@ -65,7 +78,6 @@ class TestRunner:
             success_rate = (self.test_passed / self.test_total) * 100
             print(f"Tỷ lệ thành công: {success_rate:.1f}%")
         print("=" * 70)
-    
     def wait_for_sync(self, seconds=2):
         """Đợi để dữ liệu được đồng bộ"""
         print(f"  ⏳ Đợi {seconds}s để đồng bộ dữ liệu...")
@@ -147,6 +159,11 @@ class TestRunner:
         print("  → Kiểm tra tất cả keys có thể GET...")
         for key, expected_value in test_data.items():
             value = self.client.get(key, hien_thi=False)
+            # Kiểm tra nodes sẵn sàng trước khi assert
+            if not self.check_nodes_ready():
+                print("\n❌ Không phải tất cả nodes đang online!")
+                print("   Vui lòng khởi động lại tất cả 3 nodes")
+                return
             self.assert_equal(value, expected_value, f"GET {key}")
     
     def test_data_consistency(self):
@@ -256,6 +273,24 @@ class TestRunner:
         # Kiểm tra cluster status cuối cùng
         print("\n  → Kiểm tra trạng thái cluster cuối cùng...")
         self.client.hien_thi_trang_thai_cluster()
+
+    def check_nodes_ready(self):
+        """Kiểm tra tất cả nodes đã sẵn sàng"""
+        print("  → Kiểm tra tất cả nodes đang online...")
+        online_count = 0
+        for i in range(len(NODES)):
+            try:
+                client_node = KVStoreClient([NODES[i]], timeout=2.0)
+                stats = client_node.lay_thong_ke_node(0)
+                if stats:
+                    online_count += 1
+                    print(f"    ✓ Node {i+1} online")
+                else:
+                    print(f"    ✗ Node {i+1} offline")
+            except Exception:
+                print(f"    ✗ Node {i+1} offline")
+
+        return online_count == len(NODES)
     
     def test_load_distribution(self):
         """Test phân phối tải"""
