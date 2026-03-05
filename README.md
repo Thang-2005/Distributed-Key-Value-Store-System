@@ -909,7 +909,3 @@ Muốn hiểu sâu hơn? Đọc thêm:
 - [Distributed Systems Course](https://pdos.csail.mit.edu/6.824/)
 
 ---
-
-**Happy Coding! 🚀**
-
-*Last updated: 2024*
